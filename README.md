@@ -1,3 +1,5 @@
+# Default Interest / Interés Moratorio
+
 Python program that calculates the default interest that an insurance company would have to pay if it defaults on the payment of an insurance for a specified period of time, according to Mexican law ([Ley de Instituciones de Seguros y Fianzas](https://www.diputados.gob.mx/LeyesBiblio/pdf/LISF.pdf), art. 276).
 
 ---
