@@ -8,15 +8,31 @@ getcontext().prec = 10
 def get_dates_debt():
     """
     Prompt the user to input the start and end dates and the initial debt amount.
+    Throws:
+        ValueError: If start_date is before April 4th, 1995, or end_date is after September 25th, 2024.
     Returns:
         start_date (Timestamp): Start date in YYYY-MM-DD format.
         end_date (Timestamp): End date in YYYY-MM-DD format.
         initial_debt (Decimal): Initial debt amount in MXN.
     """
 
+    # Allowed date range, defined by the start and end of UDI->MXN rates
+    min_start_date = pd.Timestamp('1995-04-04')
+    max_end_date = pd.Timestamp('2024-09-25')
+
+    # Input the dates
     start_date = pd.to_datetime(input("• Introduce la fecha de exigibilidad legal (inicio) [YYYY-MM-DD]: "))
     end_date = pd.to_datetime(input("• Introduce la fecha de resolución (fin) [YYYY-MM-DD]: "))
+
+    # Check if the dates are within the valid range
+    if start_date < min_start_date:
+        raise ValueError(f"La fecha de inicio no puede ser anterior al {min_start_date.date()}.")
+    if end_date > max_end_date:
+        raise ValueError(f"Ya no tenemos datos. Quoi faire ?")
+
+    # Input the initial debt
     initial_debt = Decimal(input("• Introduce la suerte principal en MXN: "))
+
     return start_date, end_date, initial_debt
 
 def get_udi_mxn(date):
@@ -34,6 +50,7 @@ def get_udi_mxn(date):
         parse_dates=["Date"], date_format="%d/%m/%Y", encoding="windows-1252"
     )
     result = df[df['Date'] == date]
+
     return Decimal(result['Value'].values[0]) if not result.empty else None
 
 def get_default_compensation(start_date, end_date, initial_debt):
@@ -49,10 +66,6 @@ def get_default_compensation(start_date, end_date, initial_debt):
 
     start_udi_mxn_rate = get_udi_mxn(start_date)
     end_udi_mxn_rate = get_udi_mxn(end_date)
-
-    if start_udi_mxn_rate is None or end_udi_mxn_rate is None:
-        print("Alguna de las dos fechas no está en el dataset. Quoi faire ?")
-        return None
 
     # Calculate adjusted initial debt based on UDI rates
     adjusted_initial_debt = initial_debt * (end_udi_mxn_rate / start_udi_mxn_rate)
@@ -138,11 +151,11 @@ def main():
     """
     Main function to get user inputs, calculate compensation and interest, and display results.
     """
-    start_date, end_date, initial_debt = get_dates_debt()
-    default_compensation = get_default_compensation(start_date, end_date, initial_debt)
 
-    if default_compensation is not None:
-        print(f"\n-> La indemnización por mora es de: ${default_compensation:,.2f}")
+    start_date, end_date, initial_debt = get_dates_debt()
+
+    default_compensation = get_default_compensation(start_date, end_date, initial_debt)
+    print(f"\n-> La indemnización por mora es de: ${default_compensation:,.2f}")
 
     default_interest = get_default_interest(start_date, end_date, initial_debt)
     print(f"-> El interés por mora: ${default_interest:,.2f}")
