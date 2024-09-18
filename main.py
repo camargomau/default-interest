@@ -44,7 +44,7 @@ def get_udi_mxn(date):
         Decimal: UDI-MXN rate for the given date or None if not found.
     """
 
-    udi_mxn_rates_file = "udi-mxn-20240918.csv"
+    udi_mxn_rates_file = "data/udi-mxn-20240918.csv"
     df = pd.read_csv(
         udi_mxn_rates_file, skiprows=19, names=["Date", "Value"],
         parse_dates=["Date"], date_format="%d/%m/%Y", encoding="windows-1252"
@@ -117,7 +117,7 @@ def get_default_interest(start_date, end_date, initial_debt):
         initial_debt (Decimal): Initial debt in MXN.
     """
 
-    ccp_udi_rates_file = "ccp-udi-20240918.csv"
+    ccp_udi_rates_file = "data/ccp-udi-20240918.csv"
     df = pd.read_csv(
         ccp_udi_rates_file, skiprows=19,
         names=["Date", "CCP-MXN", "CCPO-MXN", "CCP-UDI", "CCP-USD", "CPP", "CCPE", "TIPP"],
